@@ -25,8 +25,8 @@ A real-time human pose detection application that runs entirely in the browser u
 
 ## License
 
-[Add your license information here]
+See the License file for more information
 
 ## Credits
 
-Created by [Your Name]
+Created by vitor

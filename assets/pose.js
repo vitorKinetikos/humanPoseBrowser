@@ -117,13 +117,21 @@ class MoveNetPoseDetector {
      * Initialize camera and start pose detection
      */
     resizeCanvas() {
-        // Get the actual displayed size of the video
+        // Get the device pixel ratio and displayed video size
+        const dpr = window.devicePixelRatio || 1;
         const videoWidth = this.video.clientWidth;
         const videoHeight = this.video.clientHeight;
         
-        // Update canvas size to match video display size
-        this.canvas.width = videoWidth;
-        this.canvas.height = videoHeight;
+        // Set canvas size accounting for device pixel ratio
+        this.canvas.width = videoWidth * dpr;
+        this.canvas.height = videoHeight * dpr;
+        
+        // Scale the canvas CSS size to match video
+        this.canvas.style.width = `${videoWidth}px`;
+        this.canvas.style.height = `${videoHeight}px`;
+        
+        // Scale the drawing context to account for device pixel ratio
+        this.ctx.scale(dpr, dpr);
     }
     
     // Modify the startCamera method to include canvas resizing
@@ -164,9 +172,9 @@ class MoveNetPoseDetector {
         
         if (poses.length === 0) return;
         
-        // Calculate scale factors if video dimensions don't match canvas
-        const scaleX = this.canvas.width / this.video.videoWidth;
-        const scaleY = this.canvas.height / this.video.videoHeight;
+        // Calculate scale factors using displayed video dimensions
+        const scaleX = this.video.clientWidth / this.video.videoWidth;
+        const scaleY = this.video.clientHeight / this.video.videoHeight;
         
         poses.forEach(pose => {
             const keypoints = pose.keypoints;
@@ -272,6 +280,10 @@ class MoveNetPoseDetector {
         
         if (poses.length === 0) return;
         
+        // Calculate scale factors using displayed video dimensions
+        const scaleX = this.video.clientWidth / this.video.videoWidth;
+        const scaleY = this.video.clientHeight / this.video.videoHeight;
+        
         poses.forEach(pose => {
             const keypoints = pose.keypoints;
             
@@ -287,8 +299,8 @@ class MoveNetPoseDetector {
                     // Only draw connections between high-confidence keypoints
                     if (kp1.score > 0.3 && kp2.score > 0.3) {
                         this.ctx.beginPath();
-                        this.ctx.moveTo(kp1.x, kp1.y);
-                        this.ctx.lineTo(kp2.x, kp2.y);
+                        this.ctx.moveTo(kp1.x * scaleX, kp1.y * scaleY);
+                        this.ctx.lineTo(kp2.x * scaleX, kp2.y * scaleY);
                         this.ctx.stroke();
                     }
                 });
@@ -300,14 +312,14 @@ class MoveNetPoseDetector {
                     if (keypoint.score > 0.3) {
                         this.ctx.fillStyle = keypoint.score > 0.7 ? '#FF0000' : '#FFFF00';
                         this.ctx.beginPath();
-                        this.ctx.arc(keypoint.x, keypoint.y, 4, 0, 2 * Math.PI);
+                        this.ctx.arc(keypoint.x * scaleX, keypoint.y * scaleY, 4, 0, 2 * Math.PI);
                         this.ctx.fill();
                         
                         // Add labels for high-confidence points
                         if (keypoint.score > 0.7) {
                             this.ctx.fillStyle = 'white';
                             this.ctx.font = '10px Arial';
-                            this.ctx.fillText(this.keypointNames[index], keypoint.x + 5, keypoint.y - 5);
+                            this.ctx.fillText(this.keypointNames[index], keypoint.x * scaleX + 5, keypoint.y * scaleY - 5);
                         }
                     }
                 });
