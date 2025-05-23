@@ -280,9 +280,10 @@ class MoveNetPoseDetector {
         
         if (poses.length === 0) return;
         
-        // Calculate scale factors using displayed video dimensions
-        const scaleX = this.video.clientWidth / this.video.videoWidth;
-        const scaleY = this.video.clientHeight / this.video.videoHeight;
+        // Calculate scale factors accounting for both display size and device pixel ratio
+        const dpr = window.devicePixelRatio || 1;
+        const scaleX = (this.canvas.width / dpr) / this.video.videoWidth;
+        const scaleY = (this.canvas.height / dpr) / this.video.videoHeight;
         
         poses.forEach(pose => {
             const keypoints = pose.keypoints;
