@@ -290,8 +290,16 @@ class MoveNetPoseDetector {
             
             // Draw skeleton connections
             if (this.showSkeleton) {
-                this.ctx.strokeStyle = '#00FF00';
-                this.ctx.lineWidth = 2;
+                this.ctx.strokeStyle = '#FF7F50';
+                this.ctx.lineWidth = 6;
+                this.ctx.lineCap = 'round'; // 'butt', 'round', 'square'
+                this.ctx.lineJoin = 'round'; // 'miter', 'round', 'bevel'
+
+                // Glow effect
+                this.ctx.shadowColor = '#FF0000';
+                this.ctx.shadowBlur = 10;
+                this.ctx.shadowOffsetX = 0;
+                this.ctx.shadowOffsetY = 0;
                 
                 this.connections.forEach(([i, j]) => {
                     const kp1 = keypoints[i];
