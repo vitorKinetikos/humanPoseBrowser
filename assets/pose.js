@@ -116,6 +116,17 @@ class MoveNetPoseDetector {
     /**
      * Initialize camera and start pose detection
      */
+    resizeCanvas() {
+        // Get the actual displayed size of the video
+        const videoWidth = this.video.clientWidth;
+        const videoHeight = this.video.clientHeight;
+        
+        // Update canvas size to match video display size
+        this.canvas.width = videoWidth;
+        this.canvas.height = videoHeight;
+    }
+    
+    // Modify the startCamera method to include canvas resizing
     async startCamera() {
         if (!this.detector) {
             this.updateStatus('Model not loaded yet');
@@ -124,14 +135,19 @@ class MoveNetPoseDetector {
         
         try {
             this.stream = await navigator.mediaDevices.getUserMedia({
-                video: { width: 640, height: 480, facingMode: 'user' }
+                video: { facingMode: 'user' }
             });
             
             this.video.srcObject = this.stream;
             this.video.onloadedmetadata = () => {
                 this.video.play();
+                // Resize canvas after video loads
+                this.resizeCanvas();
                 this.startDetection();
             };
+            
+            // Add event listener for window resize
+            window.addEventListener('resize', () => this.resizeCanvas());
             
             document.getElementById('startBtn').disabled = true;
             document.getElementById('stopBtn').disabled = false;
@@ -140,6 +156,59 @@ class MoveNetPoseDetector {
             console.error('Error accessing camera:', error);
             this.updateStatus('Error: Could not access camera');
         }
+    }
+    
+    // Modify the drawResults method to scale keypoints correctly
+    drawResults(poses) {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        if (poses.length === 0) return;
+        
+        // Calculate scale factors if video dimensions don't match canvas
+        const scaleX = this.canvas.width / this.video.videoWidth;
+        const scaleY = this.canvas.height / this.video.videoHeight;
+        
+        poses.forEach(pose => {
+            const keypoints = pose.keypoints;
+            
+            // Draw skeleton connections
+            if (this.showSkeleton) {
+                this.ctx.strokeStyle = '#00FF00';
+                this.ctx.lineWidth = 2;
+                
+                this.connections.forEach(([i, j]) => {
+                    const kp1 = keypoints[i];
+                    const kp2 = keypoints[j];
+                    
+                    // Only draw connections between high-confidence keypoints
+                    if (kp1.score > 0.3 && kp2.score > 0.3) {
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(kp1.x * scaleX, kp1.y * scaleY);
+                        this.ctx.lineTo(kp2.x * scaleX, kp2.y * scaleY);
+                        this.ctx.stroke();
+                    }
+                });
+            }
+            
+            // Draw keypoints with confidence-based coloring
+            if (this.showKeypoints) {
+                keypoints.forEach((keypoint, index) => {
+                    if (keypoint.score > 0.3) {
+                        this.ctx.fillStyle = keypoint.score > 0.7 ? '#FF0000' : '#FFFF00';
+                        this.ctx.beginPath();
+                        this.ctx.arc(keypoint.x * scaleX, keypoint.y * scaleY, 4, 0, 2 * Math.PI);
+                        this.ctx.fill();
+                        
+                        // Add labels for high-confidence points
+                        if (keypoint.score > 0.7) {
+                            this.ctx.fillStyle = 'white';
+                            this.ctx.font = '10px Arial';
+                            this.ctx.fillText(this.keypointNames[index], keypoint.x * scaleX + 5, keypoint.y * scaleY - 5);
+                        }
+                    }
+                });
+            }
+        });
     }
     
     /**
