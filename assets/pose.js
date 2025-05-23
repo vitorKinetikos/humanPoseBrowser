@@ -40,6 +40,18 @@ class MoveNetPoseDetector {
             'left_knee', 'right_knee', 'left_ankle', 'right_ankle'
         ];
         
+        // Skeleton display styles
+        this.skeletonStyles = {
+            strokeStyle: '#FF7F50',
+            lineWidth: 12,
+            lineCap: 'round',
+            lineJoin: 'round',
+            shadowColor: '#FF0000',
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowOffsetY: 0
+        };
+        
         this.initializeEventListeners();
         this.loadModel();
     }
@@ -181,8 +193,8 @@ class MoveNetPoseDetector {
             
             // Draw skeleton connections
             if (this.showSkeleton) {
-                this.ctx.strokeStyle = '#00FF00';
-                this.ctx.lineWidth = 2;
+                // Apply skeleton styles
+                Object.assign(this.ctx, this.skeletonStyles);
                 
                 this.connections.forEach(([i, j]) => {
                     const kp1 = keypoints[i];
@@ -196,6 +208,12 @@ class MoveNetPoseDetector {
                         this.ctx.stroke();
                     }
                 });
+                
+                // Reset shadow effects after drawing skeleton
+                this.ctx.shadowColor = 'transparent';
+                this.ctx.shadowBlur = 0;
+                this.ctx.shadowOffsetX = 0;
+                this.ctx.shadowOffsetY = 0;
             }
             
             // Draw keypoints with confidence-based coloring
