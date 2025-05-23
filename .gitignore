@@ -1,0 +1,11 @@
+### macOS ###
+*.DS_Store
+.AppleDouble
+.LSOverride
+# Dependencies
+node_modules/
+# Environment files
+.env
+# Build files
+dist/
+build/

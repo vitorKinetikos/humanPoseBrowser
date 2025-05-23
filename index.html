@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TensorFlow.js MoveNet Pose Detection</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.10.0/tf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tensorflow-models/0.0.1/pose-detection.min.js"></script>
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1>🤖 TensorFlow.js MoveNet</h1>
+        <div class="subtitle">Real-time Pose Detection in Your Browser</div>
+    </div>
+    
+    <div class="main-container">
+        <div class="model-selector">
+            <label for="modelSelect">Model: </label>
+            <select id="modelSelect">
+                <option value="lightning">MoveNet Lightning (Fast)</option>
+                <option value="thunder">MoveNet Thunder (Accurate)</option>
+                <option value="multipose">MoveNet MultiPose</option>
+            </select>
+        </div>
+        
+        <div class="video-container">
+            <video id="video" width="640" height="480" autoplay muted playsinline></video>
+            <canvas id="canvas" width="640" height="480"></canvas>
+        </div>
+        
+        <div class="controls">
+            <button id="startBtn">🎥 Start Camera</button>
+            <button id="stopBtn" disabled>⏹️ Stop</button>
+            <button id="toggleSkeleton">🦴 Toggle Skeleton</button>
+            <button id="toggleKeypoints">📍 Toggle Points</button>
+        </div>
+        
+        <div class="status" id="status">Click "Start Camera" to begin pose detection</div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="fpsValue">0</div>
+                <div class="stat-label">FPS</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="poseCount">0</div>
+                <div class="stat-label">Poses Detected</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="confidenceValue">0%</div>
+                <div class="stat-label">Avg Confidence</div>
+            </div>
+        </div>
+        
+        <div class="keypoints-info" id="keypointsInfo">
+            <strong>Keypoints Info:</strong><br>
+            No poses detected yet...
+        </div>
+    </div>
+
+    <script src="assets/pose.js"></script>
+</body>
+</html>
